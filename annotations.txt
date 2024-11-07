@@ -1,0 +1,6 @@
+TODO:
+
+Op. aritméticos (+, -, *)
+Op. Booleanos (and, or, not)
+Op. Relacionais (==, <, >)
+Condicionais
