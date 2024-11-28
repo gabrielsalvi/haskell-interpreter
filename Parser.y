@@ -26,7 +26,7 @@ import Lexer
 
 %nonassoc if then else
 %left '+' '-' and
-%left '*' and
+%left '*'
 %left "==" '<' '>'
 
 %%

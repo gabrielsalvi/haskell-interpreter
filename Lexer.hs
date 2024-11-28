@@ -43,16 +43,16 @@ data Token = TokenTrue
            | TokenArrow
            deriving (Show)
 
-isSymb :: Char -> Bool 
-isSymb c = c `elem` ['+', '-', '*', '>', '<', '=', '\\', '-', '>']
+isSymb :: Char -> Bool
+isSymb c = c `elem` "+-*/=><\\"
 
 lexer :: String -> [Token]
 lexer [] = []
 lexer (c:cs)
     | isSpace c = lexer cs
+    | isSymb c = lexerSymbol (c:cs)
     | isAlpha c = lexerKW (c:cs)
     | isDigit c = lexerNum (c:cs)
-    | isSymb c = lexerSymbol (c:cs)
 
 lexerNum :: String -> [Token]
 lexerNum cs = case span isDigit cs of
@@ -70,7 +70,7 @@ lexerKW cs = case span isAlpha cs of
                 (var, rest) -> TokenVar var : lexer rest
 
 lexerSymbol :: String -> [Token]
-lexerSymbol cs = case span isSymbol cs of
+lexerSymbol cs = case span isSymb cs of
                     ("->", rest) -> TokenArrow : lexer rest
                     ("\\", rest) -> TokenLam : lexer rest
                     ("+", rest) -> TokenAdd : lexer rest
