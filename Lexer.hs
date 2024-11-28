@@ -23,6 +23,7 @@ data Expr = BTrue
 data Ty = TBool
         | TNum
         | TFun Ty Ty
+        | TCoord
         deriving (Show, Eq)
 
 data Token = TokenTrue
