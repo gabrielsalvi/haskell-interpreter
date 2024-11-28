@@ -7,6 +7,7 @@ isValue BTrue = True
 isValue BFalse = True
 isValue (Num _) = True
 isValue (Lam _ _ _) = True
+isValue (Coord _ _) = True
 isValue _ = False
 
 getNum :: Expr -> Maybe Int
@@ -61,6 +62,11 @@ step (Or e1 e2) = Or (step e1) e2
 step (If BTrue e1 e2) = e1
 step (If BFalse e1 e2) = e2
 step (If e e1 e2) = If (step e) e1 e2
+
+-- Eq (Coord)
+step (Eq (Coord lat1 lon1) (Coord lat2 lon2))
+  | isValue lat1 && isValue lon1 && isValue lat2 && isValue lon2 =
+      if lat1 == lat2 && lon1 == lon2 then BTrue else BFalse
 
 -- Eq
 step (Eq e1 e2) 
