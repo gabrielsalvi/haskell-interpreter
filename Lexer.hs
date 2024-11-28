@@ -42,7 +42,7 @@ data Token = TokenTrue
            | TokenVar String
            | TokenLam
            | TokenArrow
-           | TokenCoord (Double, Double)
+           | TokenCoord { latitude :: Double, longitude :: Double }
            deriving (Show)
 
 isSymb :: Char -> Bool
@@ -98,6 +98,15 @@ lexerSymbol cs = case span isSymb cs of
                     _ -> error "Lexical error: invalid symbol!"
 
 lexerCoord :: String -> [Token]
-lexerCoord cs = case span isDigitOrDot cs of
-  (lat, ',' : lon) -> [TokenCoord (read lat, read lon)]
-  _ -> error "Invalid coordinate format!"
+lexerCoord cs = 
+  case span isDigitOrDot cs of
+    ("", _) -> error "Lexical error: missing latitude before ','!"
+    (latStr, ',' : rest) ->
+      case span isDigitOrDot rest of
+        ("", _) -> error "Lexical error: missing longitude after ','!"
+        (lonStr, "") ->
+          let lat = read latStr :: Double
+              lon = read lonStr :: Double
+          in [TokenCoord { latitude = lat, longitude = lon }]
+        _ -> error "Lexical error: invalid coordinate format!"
+    _ -> error "Lexical error: invalid coordinate format!"
