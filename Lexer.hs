@@ -6,6 +6,8 @@ data Expr = BTrue
         | BFalse
         | Num Int
         | Add Expr Expr
+        | Minus Expr Expr
+        | Mult Expr Expr
         | And Expr Expr
         | Eq Expr Expr
         | If Expr Expr Expr
@@ -23,6 +25,8 @@ data Token = TokenTrue
            | TokenFalse
            | TokenNum Int
            | TokenAdd
+           | TokenMinus
+           | TokenMult
            | TokenAnd
            | TokenEq
            | TokenIf
@@ -35,10 +39,12 @@ data Token = TokenTrue
 
 lexer :: String -> [Token]
 lexer [] = []
+lexer ('-':'>':cs) = TokenArrow : lexer cs
 lexer ('+' : cs) = TokenAdd : lexer cs
+lexer ('-' : cs) = TokenMinus : lexer cs
+lexer ('*' : cs) = TokenMult : lexer cs
 lexer ('\\':cs) = TokenLam : lexer cs 
 lexer ('=' : '=' : cs) = TokenEq : lexer cs
-lexer ('-':'>':cs) = TokenArrow : lexer cs 
 lexer (c:cs)
     | isSpace c = lexer cs
     | isAlpha c = lexerKW (c:cs)

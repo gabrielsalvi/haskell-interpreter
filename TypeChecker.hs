@@ -2,24 +2,30 @@ module TypeChecker where
 
 import Lexer
 
-type Ctx = [(String, Ty)]
+type Context = [(String, Ty)]
 
-typeof :: Ctx -> Expr -> Maybe Ty
+typeof :: Context -> Expr -> Maybe Ty
 typeof _ (Num _) = Just TNum
 typeof _ BTrue = Just TBool
 typeof _ BFalse = Just TBool
 typeof ctx (Add e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
                         (Just TNum, Just TNum) -> Just TNum
                         _ -> Nothing
+typeof ctx (Minus e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
+                        (Just TNum, Just TNum) -> Just TNum
+                        _ -> Nothing
+typeof ctx (Mult e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
+                         (Just TNum, Just TNum) -> Just TNum
+                         _ -> Nothing
 typeof ctx (And e1 e2) = case (typeof ctx e1, typeof ctx e2) of
                         (Just TBool, Just TBool) -> Just TBool
                         _ -> Nothing
-typeof ctx (If e e1 e2) = case typeof ctx e of
-                        Just TBool -> case (typeof ctx e1, typeof ctx e2) of
-                                        (Just t1, Just t2) | t1 == t2 -> Just t1
-                                                           | otherwise -> Nothing 
-                                        _ -> Nothing
-                        _ -> Nothing
+typeof ctx (If e e1 e2) = case typeof ctx e of 
+                            Just TBool -> case (typeof ctx e1, typeof ctx e2) of 
+                                            (Just t1, Just t2) | t1 == t2 -> Just t1 
+                                                               | otherwise -> Nothing
+                                            _ -> Nothing
+                            _ -> Nothing
 
 typeof ctx (Eq e1 e2) = case (typeof ctx e1, typeof ctx e2) of
                         (Just t1, Just t2) | t1 == t2 -> Just TBool

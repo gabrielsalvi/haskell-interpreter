@@ -13,6 +13,8 @@ import Lexer
     false { TokenFalse}
     num { TokenNum $$ }
     '+' { TokenAdd }
+    '-' { TokenMinus }
+    '*' { TokenMult }
     and { TokenAnd }
     "==" { TokenEq }
     if { TokenIf }
@@ -20,7 +22,9 @@ import Lexer
     else { TokenElse }
 
 %nonassoc if then else
-%left '+' and 
+%left '+' and
+%left '-' and
+%left '*' and
 %left "=="
 
 %%
@@ -29,6 +33,8 @@ Exp : true { BTrue }
     | false { BFalse }
     | num { Num $1 }
     | Exp '+' Exp { Add $1 $3 }
+    | Exp '-' Exp { Minus $1 $3 }
+    | Exp '*' Exp { Mult $1 $3 }
     | Exp and Exp { And $1 $3 }
     | if Exp then Exp else Exp { If $2 $4 $6 }
     | Exp "==" Exp { Eq $1 $3 }
