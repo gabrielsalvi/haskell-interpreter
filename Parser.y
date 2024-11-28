@@ -16,16 +16,18 @@ import Lexer
     '-' { TokenMinus }
     '*' { TokenMult }
     and { TokenAnd }
+    or { TokenOr }
     "==" { TokenEq }
+    '>' { TokenGreaterThan }
+    '<' { TokenLessThan }
     if { TokenIf }
     then { TokenThen }
     else { TokenElse }
 
 %nonassoc if then else
-%left '+' and
-%left '-' and
+%left '+' '-' and
 %left '*' and
-%left "=="
+%left "==" '<' '>'
 
 %%
 
@@ -38,6 +40,8 @@ Exp : true { BTrue }
     | Exp and Exp { And $1 $3 }
     | if Exp then Exp else Exp { If $2 $4 $6 }
     | Exp "==" Exp { Eq $1 $3 }
+    | Exp '<' Exp { Lt $1 $3 }
+    | Exp '>' Exp { Gt $1 $3 }
 
 {
 parseError :: [Token] -> a

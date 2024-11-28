@@ -31,6 +31,13 @@ typeof ctx (Eq e1 e2) = case (typeof ctx e1, typeof ctx e2) of
                         (Just t1, Just t2) | t1 == t2 -> Just TBool
                                            | otherwise -> Nothing
                         _ -> Nothing
+
+typeof ctx (Lt e1 e2) = case (typeof ctx e1, typeof ctx e2) of
+                             (Just TNum, Just TNum) -> Just TBool
+                             _                      -> Nothing
+typeof ctx (Gt e1 e2) = case (typeof ctx e1, typeof ctx e2) of
+                                (Just TNum, Just TNum) -> Just TBool
+                                _                      -> Nothing
 typeof ctx (Var v) = lookup v ctx 
 typeof ctx (Lam v t1 b) = let Just t2 = typeof ((v, t1) : ctx) b 
                             in Just (TFun t1 t2)

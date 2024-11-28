@@ -9,7 +9,10 @@ data Expr = BTrue
         | Minus Expr Expr
         | Mult Expr Expr
         | And Expr Expr
+        | Or Expr Expr
         | Eq Expr Expr
+        | Gt Expr Expr
+        | Lt Expr Expr
         | If Expr Expr Expr
         | Var String
         | Lam String Ty Expr
@@ -28,7 +31,10 @@ data Token = TokenTrue
            | TokenMinus
            | TokenMult
            | TokenAnd
+           | TokenOr
            | TokenEq
+           | TokenGreaterThan
+           | TokenLessThan
            | TokenIf
            | TokenThen
            | TokenElse
@@ -37,18 +43,16 @@ data Token = TokenTrue
            | TokenArrow
            deriving (Show)
 
+isSymb :: Char -> Bool 
+isSymb c = c `elem` ['+', '-', '*', '>', '<', '=', '\\', '-', '>']
+
 lexer :: String -> [Token]
 lexer [] = []
-lexer ('-':'>':cs) = TokenArrow : lexer cs
-lexer ('+' : cs) = TokenAdd : lexer cs
-lexer ('-' : cs) = TokenMinus : lexer cs
-lexer ('*' : cs) = TokenMult : lexer cs
-lexer ('\\':cs) = TokenLam : lexer cs 
-lexer ('=' : '=' : cs) = TokenEq : lexer cs
 lexer (c:cs)
     | isSpace c = lexer cs
     | isAlpha c = lexerKW (c:cs)
     | isDigit c = lexerNum (c:cs)
+    | isSymb c = lexerSymbol (c:cs)
 
 lexerNum :: String -> [Token]
 lexerNum cs = case span isDigit cs of
@@ -59,7 +63,20 @@ lexerKW cs = case span isAlpha cs of
                 ("true", rest) -> TokenTrue : lexer rest
                 ("false", rest) -> TokenFalse : lexer rest
                 ("and", rest) -> TokenAnd : lexer rest
+                ("or", rest) -> TokenOr : lexer rest
                 ("if", rest) -> TokenIf : lexer rest
                 ("then", rest) -> TokenThen : lexer rest
                 ("else", rest) -> TokenElse : lexer rest
                 (var, rest) -> TokenVar var : lexer rest
+
+lexerSymbol :: String -> [Token]
+lexerSymbol cs = case span isSymbol cs of
+                    ("->", rest) -> TokenArrow : lexer rest
+                    ("\\", rest) -> TokenLam : lexer rest
+                    ("+", rest) -> TokenAdd : lexer rest
+                    ("-", rest) -> TokenMinus : lexer rest
+                    ("*", rest) -> TokenMult : lexer rest
+                    ("==", rest) -> TokenEq : lexer rest
+                    (">", rest) -> TokenGreaterThan : lexer rest
+                    ("<", rest) -> TokenLessThan : lexer rest
+                    _ -> error "Lexical error: invalid symbol!"

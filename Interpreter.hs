@@ -9,6 +9,10 @@ isValue (Num _) = True
 isValue (Lam _ _ _) = True
 isValue _ = False
 
+getNum :: Expr -> Maybe Int
+getNum (Num n) = Just n
+getNum _ = Nothing
+
 -- Parâmetros: Variável (Parâmetro formal), Expressão (Parâmetro atual), Corpo da função
 -- Retorno: Corpo da função substituído
 subst :: String -> Expr -> Expr -> Expr
@@ -17,7 +21,10 @@ subst x n (Add e1 e2) = (Add (subst x n e1) (subst x n e2))
 subst x n (Mult e1 e2) = (Mult (subst x n e1) (subst x n e2))
 subst x n (Minus e1 e2) = (Minus (subst x n e1) (subst x n e2))
 subst x n (And e1 e2) = (And (subst x n e1) (subst x n e2))
+subst x n (Or e1 e2) = (Or (subst x n e1) (subst x n e2))
 subst x n (Eq e1 e2) = (Eq (subst x n e1) (subst x n e2))
+subst x n (Lt e1 e2) = Lt (subst x n e1) (subst x n e2)
+subst x n (Gt e1 e2) = Gt (subst x n e1) (subst x n e2)
 subst x n (If e e1 e2) = (If (subst x n e) (subst x n e1) (subst x n e2))
 subst x n (Lam v t b) = (Lam v t (subst x n b))
 subst x n (App e1 e2) = (App (subst x n e1) (subst x n e2))
@@ -45,19 +52,42 @@ step (And BFalse e) = BFalse
 step (And BTrue e) = e
 step (And e1 e2) = And (step e1) e2
 
+-- Or
+step (Or BTrue e) = BTrue
+step (Or BFalse e) = e
+step (Or e1 e2) = Or (step e1) e2
+
 -- If
 step (If BTrue e1 e2) = e1
 step (If BFalse e1 e2) = e2
 step (If e e1 e2) = If (step e) e1 e2
 
 -- Eq
-step (Eq e1 e2) | isValue e1 && isValue e2 = if (e1 == e2) then BTrue else BFalse
-                | isValue e1 = Eq e1 (step e2)
-                | otherwise = Eq (step e1) e2
+step (Eq e1 e2) 
+    | isValue e1 && isValue e2 = if (e1 == e2) then BTrue else BFalse
+    | isValue e1 = Eq e1 (step e2)
+    | otherwise = Eq (step e1) e2
+
+-- GT
+step (Gt e1 e2)
+  | isValue e1 && isValue e2 = case (getNum e1, getNum e2) of
+      (Just n1, Just n2) -> if n1 > n2 then BTrue else BFalse
+      _ -> error "Gt: non-numeric value"
+  | isValue e1 = Gt e1 (step e2)
+  | otherwise = Gt (step e1) e2
+
+-- LT
+step (Lt e1 e2)
+  | isValue e1 && isValue e2 = case (getNum e1, getNum e2) of
+      (Just n1, Just n2) -> if n1 < n2 then BTrue else BFalse
+      _ -> error "Lt: non-numeric value" -- Lança erro se não forem números
+  | isValue e1 = Lt e1 (step e2)
+  | otherwise = Lt (step e1) e2
 
 -- Lam
-step (App (Lam v t b) e) | isValue e = subst v e b
-                         | otherwise = (App (Lam v t b) (step e))
+step (App (Lam v t b) e) 
+    | isValue e = subst v e b
+    | otherwise = (App (Lam v t b) (step e))
 step (App e1 e2) = App (step e1) e2
 step e = error (show e)
 
