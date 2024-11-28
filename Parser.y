@@ -13,7 +13,7 @@ import Lexer
     false { TokenFalse}
     num { TokenNum $$ }
     '+' { TokenAdd }
-    and { TokenAnd}
+    and { TokenAnd }
     "==" { TokenEq }
     if { TokenIf }
     then { TokenThen }

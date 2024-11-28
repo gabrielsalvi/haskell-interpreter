@@ -6,7 +6,20 @@ isValue :: Expr -> Bool
 isValue BTrue = True
 isValue BFalse = True
 isValue (Num _) = True
+isValue (Lam _ _ _) = True
 isValue _ = False
+
+-- Parâmetros: Variável (Parâmetro formal), Expressão (Parâmetro atual), Corpo da função
+-- Retorno: Corpo da função substituído
+subst :: String -> Expr -> Expr -> Expr
+subst x n b@(Var v) = if v == x then n else b
+subst x n (Add e1 e2) = (Add (subst x n e1) (subst x n e2))
+subst x n (And e1 e2) = (And (subst x n e1) (subst x n e2))
+subst x n (Eq e1 e2) = (Eq (subst x n e1) (subst x n e2))
+subst x n (If e e1 e2) = (If (subst x n e) (subst x n e1) (subst x n e2))
+subst x n (Lam v t b) = (Lam v t (subst x n b))
+subst x n (App e1 e2) = (App (subst x n e1) (subst x n e2))
+subst _ _ e = e
 
 step :: Expr -> Expr
 
@@ -30,6 +43,11 @@ step (Eq e1 e2) | isValue e1 && isValue e2 = if (e1 == e2) then BTrue else BFals
                 | isValue e1 = Eq e1 (step e2)
                 | otherwise = Eq (step e1) e2
 
+-- Lam
+step (App (Lam v t b) e) | isValue e = subst v e b
+                         | otherwise = (App (Lam v t b) (step e))
+step (App e1 e2) = App (step e1) e2
+step e = error (show e)
 
 -- Eval
 eval :: Expr -> Expr

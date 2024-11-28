@@ -4,3 +4,5 @@ Op. aritméticos (+, -, *)
 Op. Booleanos (and, or, not)
 Op. Relacionais (==, <, >)
 Condicionais
+
+Implementar lexer e parser do App
