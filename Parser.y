@@ -26,7 +26,11 @@ import Lexer
     '[' { TokenOpenSquareBracket }
     ']' { TokenCloseSquareBracket }
     ',' { TokenComma }
-
+    '\\' { TokenLam }
+    "->" { TokenArrow }
+    listHead { TokenListHead }
+    var { TokenVar $$ }
+    
 %nonassoc if then else
 %left or and
 %left "==" '<' '>'
@@ -48,6 +52,8 @@ Exp : true { BTrue }
     | Exp '<' Exp { Lt $1 $3 }
     | Exp '>' Exp { Gt $1 $3 }
     | '[' ListExp ']' { List $2 }
+    | var { Var $1 }
+    | listHead Exp { ListHead $2 }
 
 ListExp : { [] }
         | Exp { [$1] }

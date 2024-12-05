@@ -30,6 +30,7 @@ subst x n (If e e1 e2) = If (subst x n e) (subst x n e1) (subst x n e2)
 subst x n (Lam v t b) = Lam v t (subst x n b)
 subst x n (App e1 e2) = App (subst x n e1) (subst x n e2)
 subst x n (List l) = List (map (subst x n) l)
+subst x n (ListHead e) = ListHead (subst x n e)
 subst _ _ e = e
 
 step :: Expr -> Expr
@@ -102,6 +103,11 @@ step (List es) =
     stepFirst e
       | isValue e = e
       | otherwise = step e
+
+-- ListHead
+step (ListHead (List (x:_))) = x
+step (ListHead (List [])) = error "listHead: empty list"
+step (ListHead e) = ListHead (step e)
 
 step e = error (show e)
 
