@@ -108,3 +108,15 @@ step e = error (show e)
 -- Eval
 eval :: Expr -> Expr
 eval e = if isValue e then e else eval (step e)
+
+-- head
+listHead :: Expr -> Expr
+listHead (List (x:_)) = x
+listHead (List []) = error "listHead: empty list"
+listHead _ = error "listHead: not a List"
+
+-- tail
+listTail :: Expr -> Expr
+listTail (List (_:xs)) = List xs
+listTail (List []) = error "listTail: empty list"
+listTail _ = error "listTail: not a List"

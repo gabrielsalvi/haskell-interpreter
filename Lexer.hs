@@ -75,15 +75,16 @@ lexerKW cs = case span isAlpha cs of
                 (var, rest) -> TokenVar var : lexer rest
 
 lexerSymbol :: String -> [Token]
-lexerSymbol (c:cs) = case c of
-    '[' -> TokenOpenSquareBracket : lexer cs
-    ']' -> TokenCloseSquareBracket : lexer cs
-    ',' -> TokenComma : lexer cs
-    '+' -> TokenAdd : lexer cs
-    '-' -> TokenMinus : lexer cs
-    '*' -> TokenMult : lexer cs
-    '>' -> TokenGreaterThan : lexer cs
-    '<' -> TokenLessThan : lexer cs
-    '\\' -> TokenLam : lexer cs
+lexerSymbol cs = case cs of
+    ('-':'>':rest) -> TokenArrow : lexer rest
+    ('=':'=':rest) -> TokenEq : lexer rest
+    ('\\':rest)    -> TokenLam : lexer rest
+    ('+':rest)     -> TokenAdd : lexer rest
+    ('-':rest)     -> TokenMinus : lexer rest
+    ('*':rest)     -> TokenMult : lexer rest
+    ('>':rest)     -> TokenGreaterThan : lexer rest
+    ('<':rest)     -> TokenLessThan : lexer rest
+    ('[':rest)     -> TokenOpenSquareBracket : lexer rest
+    (']':rest)     -> TokenCloseSquareBracket : lexer rest
+    (',':rest)     -> TokenComma : lexer rest
     _ -> error "Lexical error: invalid symbol!"
-lexerSymbol [] = error "Lexical error: unexpected end of input!"
