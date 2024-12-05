@@ -7,7 +7,7 @@ isValue BTrue = True
 isValue BFalse = True
 isValue (Num _) = True
 isValue (Lam _ _ _) = True
-isValue (List _) = True
+isValue (List es) = all isValue es
 isValue _ = False
 
 getNum :: Expr -> Maybe Int
@@ -91,6 +91,18 @@ step (App (Lam v t b) e)
     | isValue e = subst v e b
     | otherwise = App (Lam v t b) (step e)
 step (App e1 e2) = App (step e1) e2
+
+-- List
+step (List es) =
+  let stepped = map stepFirst es
+  in if stepped == es
+        then List es
+        else List stepped
+  where
+    stepFirst e
+      | isValue e = e
+      | otherwise = step e
+
 step e = error (show e)
 
 -- Eval
