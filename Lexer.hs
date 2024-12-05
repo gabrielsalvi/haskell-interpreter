@@ -87,13 +87,13 @@ lexerSymbol :: String -> [Token]
 lexerSymbol cs = case cs of
     ('-':'>':rest) -> TokenArrow : lexer rest
     ('=':'=':rest) -> TokenEq : lexer rest
-    ('\\':rest)    -> TokenLam : lexer rest
-    ('+':rest)     -> TokenAdd : lexer rest
-    ('-':rest)     -> TokenMinus : lexer rest
-    ('*':rest)     -> TokenMult : lexer rest
-    ('>':rest)     -> TokenGreaterThan : lexer rest
-    ('<':rest)     -> TokenLessThan : lexer rest
-    ('[':rest)     -> TokenOpenSquareBracket : lexer rest
-    (']':rest)     -> TokenCloseSquareBracket : lexer rest
-    (',':rest)     -> TokenComma : lexer rest
+    ('\\':rest) -> TokenLam : lexer rest
+    ('+':rest) -> TokenAdd : lexer rest
+    ('-':rest) -> TokenMinus : lexer rest
+    ('*':rest) -> TokenMult : lexer rest
+    ('>':rest) -> TokenGreaterThan : lexer rest
+    ('<':rest) -> TokenLessThan : lexer rest
+    ('[':rest) -> TokenOpenSquareBracket : lexer rest
+    (']':rest) -> TokenCloseSquareBracket : lexer rest
+    (',':rest) -> TokenComma : lexer rest
     _ -> error "Lexical error: invalid symbol!"
