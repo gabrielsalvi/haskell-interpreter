@@ -1,1 +1,1 @@
-listTail [4, 2, 3]
+listTail [true, false, true]
