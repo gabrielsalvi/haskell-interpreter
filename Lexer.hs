@@ -17,12 +17,13 @@ data Expr = BTrue
         | Var String
         | Lam String Ty Expr
         | App Expr Expr
+        | List [Expr]
         deriving (Show, Eq)
 
 data Ty = TBool
         | TNum
         | TFun Ty Ty
-        | TCoord
+        | TList Ty
         deriving (Show, Eq)
 
 data Token = TokenTrue
@@ -42,10 +43,13 @@ data Token = TokenTrue
            | TokenVar String
            | TokenLam
            | TokenArrow
+           | TokenOpenSquareBracket
+           | TokenCloseSquareBracket
+           | TokenComma
            deriving (Show)
 
 isSymb :: Char -> Bool
-isSymb c = c `elem` "+-*/=><\\"
+isSymb c = c `elem` "+-*/=><\\,[]"
 
 lexer :: String -> [Token]
 lexer [] = []
@@ -71,13 +75,15 @@ lexerKW cs = case span isAlpha cs of
                 (var, rest) -> TokenVar var : lexer rest
 
 lexerSymbol :: String -> [Token]
-lexerSymbol cs = case span isSymb cs of
-                    ("->", rest) -> TokenArrow : lexer rest
-                    ("\\", rest) -> TokenLam : lexer rest
-                    ("+", rest) -> TokenAdd : lexer rest
-                    ("-", rest) -> TokenMinus : lexer rest
-                    ("*", rest) -> TokenMult : lexer rest
-                    ("==", rest) -> TokenEq : lexer rest
-                    (">", rest) -> TokenGreaterThan : lexer rest
-                    ("<", rest) -> TokenLessThan : lexer rest
-                    _ -> error "Lexical error: invalid symbol!"
+lexerSymbol (c:cs) = case c of
+    '[' -> TokenOpenSquareBracket : lexer cs
+    ']' -> TokenCloseSquareBracket : lexer cs
+    ',' -> TokenComma : lexer cs
+    '+' -> TokenAdd : lexer cs
+    '-' -> TokenMinus : lexer cs
+    '*' -> TokenMult : lexer cs
+    '>' -> TokenGreaterThan : lexer cs
+    '<' -> TokenLessThan : lexer cs
+    '\\' -> TokenLam : lexer cs
+    _ -> error "Lexical error: invalid symbol!"
+lexerSymbol [] = error "Lexical error: unexpected end of input!"

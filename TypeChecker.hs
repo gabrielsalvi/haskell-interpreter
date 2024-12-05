@@ -9,30 +9,24 @@ typeof _ (Num _) = Just TNum
 typeof _ BTrue = Just TBool
 typeof _ BFalse = Just TBool
 
-typeof ctx (Add e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
+typeof ctx (Add e1 e2) = case (typeof ctx e1, typeof ctx e2) of
                         (Just TNum, Just TNum) -> Just TNum
                         _ -> Nothing
-typeof ctx (Minus e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
+typeof ctx (Minus e1 e2) = case (typeof ctx e1, typeof ctx e2) of
                         (Just TNum, Just TNum) -> Just TNum
                         _ -> Nothing
-typeof ctx (Mult e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
+typeof ctx (Mult e1 e2) = case (typeof ctx e1, typeof ctx e2) of
                          (Just TNum, Just TNum) -> Just TNum
                          _ -> Nothing
 typeof ctx (And e1 e2) = case (typeof ctx e1, typeof ctx e2) of
                         (Just TBool, Just TBool) -> Just TBool
                         _ -> Nothing
-typeof ctx (If e e1 e2) = case typeof ctx e of 
-                            Just TBool -> case (typeof ctx e1, typeof ctx e2) of 
-                                            (Just t1, Just t2) | t1 == t2 -> Just t1 
+typeof ctx (If e e1 e2) = case typeof ctx e of
+                            Just TBool -> case (typeof ctx e1, typeof ctx e2) of
+                                            (Just t1, Just t2) | t1 == t2 -> Just t1
                                                                | otherwise -> Nothing
                                             _ -> Nothing
                             _ -> Nothing
-
-typeof ctx (Eq e1 e2) = case (typeof ctx e1, typeof ctx e2) of
-                        (Just TCoord, Just TCoord) -> Just TBool
-                        (Just t1, Just t2) | t1 == t2 -> Just TBool
-                                           | otherwise -> Nothing
-                        _ -> Nothing
 
 typeof ctx (Lt e1 e2) = case (typeof ctx e1, typeof ctx e2) of
                              (Just TNum, Just TNum) -> Just TBool
@@ -40,13 +34,23 @@ typeof ctx (Lt e1 e2) = case (typeof ctx e1, typeof ctx e2) of
 typeof ctx (Gt e1 e2) = case (typeof ctx e1, typeof ctx e2) of
                                 (Just TNum, Just TNum) -> Just TBool
                                 _                      -> Nothing
-typeof ctx (Var v) = lookup v ctx 
-typeof ctx (Lam v t1 b) = let Just t2 = typeof ((v, t1) : ctx) b 
+typeof ctx (Var v) = lookup v ctx
+typeof ctx (Lam v t1 b) = let Just t2 = typeof ((v, t1) : ctx) b
                             in Just (TFun t1 t2)
-typeof ctx (App e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
-                           (Just (TFun t11 t12), Just t2) | t11 == t2 -> Just t12 
-                                                          | otherwise -> Nothing 
+typeof ctx (App e1 e2) = case (typeof ctx e1, typeof ctx e2) of
+                           (Just (TFun t11 t12), Just t2) | t11 == t2 -> Just t12
+                                                          | otherwise -> Nothing
                            _ -> Nothing
+
+typeof ctx (List l) = case l of
+                        [] -> Just (TList TNum)
+                        (x:xs) -> case typeof ctx x of
+                                    Just t -> if all ((== t) . (\e -> case typeof ctx e of
+                                                                        Just t' -> t'
+                                                                        _ -> error "Erro verificando tipo da lista")) xs
+                                              then Just (TList t)
+                                              else Nothing
+                                    _ -> Nothing
 
 typecheck :: Expr -> Expr
 typecheck e = case typeof [] e of

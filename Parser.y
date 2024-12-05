@@ -23,6 +23,9 @@ import Lexer
     if { TokenIf }
     then { TokenThen }
     else { TokenElse }
+    '[' { TokenOpenSquareBracket }
+    ']' { TokenCloseSquareBracket }
+    ',' { TokenComma }
 
 %nonassoc if then else
 %left '+' '-' and or
@@ -42,6 +45,11 @@ Exp : true { BTrue }
     | Exp "==" Exp { Eq $1 $3 }
     | Exp '<' Exp { Lt $1 $3 }
     | Exp '>' Exp { Gt $1 $3 }
+    | '[' ListExp ']' { List $2 }
+
+ListExp : { [] }
+        | Exp { [$1] }
+        | Exp ',' ListExp { $1 : $3 }
 
 {
 

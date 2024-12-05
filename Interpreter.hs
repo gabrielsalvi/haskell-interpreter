@@ -7,6 +7,7 @@ isValue BTrue = True
 isValue BFalse = True
 isValue (Num _) = True
 isValue (Lam _ _ _) = True
+isValue (List _) = True
 isValue _ = False
 
 getNum :: Expr -> Maybe Int
@@ -28,6 +29,7 @@ subst x n (Gt e1 e2) = Gt (subst x n e1) (subst x n e2)
 subst x n (If e e1 e2) = If (subst x n e) (subst x n e1) (subst x n e2)
 subst x n (Lam v t b) = Lam v t (subst x n b)
 subst x n (App e1 e2) = App (subst x n e1) (subst x n e2)
+subst x n (List l) = List (map (subst x n) l)
 subst _ _ e = e
 
 step :: Expr -> Expr
