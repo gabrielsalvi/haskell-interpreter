@@ -10,7 +10,7 @@ import Lexer
 
 %token
     true { TokenTrue }
-    false { TokenFalse}
+    false { TokenFalse }
     num { TokenNum $$ }
     '+' { TokenAdd }
     '-' { TokenMinus }
@@ -25,7 +25,7 @@ import Lexer
     else { TokenElse }
 
 %nonassoc if then else
-%left '+' '-' and
+%left '+' '-' and or
 %left '*'
 %left "==" '<' '>'
 
@@ -44,6 +44,7 @@ Exp : true { BTrue }
     | Exp '>' Exp { Gt $1 $3 }
 
 {
+
 parseError :: [Token] -> a
 parseError ts = error "Syntax error: sequência de instruções inválidas"
 }

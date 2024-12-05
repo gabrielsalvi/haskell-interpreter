@@ -9,10 +9,6 @@ typeof _ (Num _) = Just TNum
 typeof _ BTrue = Just TBool
 typeof _ BFalse = Just TBool
 
-typeof ctx (Coord lat lon) = case (typeof ctx lat, typeof ctx lon) of
-                               (Just TNum, Just TNum) -> Just TCoord
-                               _ -> Nothing
-
 typeof ctx (Add e1 e2) = case (typeof ctx e1, typeof ctx e2) of 
                         (Just TNum, Just TNum) -> Just TNum
                         _ -> Nothing
