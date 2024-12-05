@@ -31,6 +31,7 @@ subst x n (Lam v t b) = Lam v t (subst x n b)
 subst x n (App e1 e2) = App (subst x n e1) (subst x n e2)
 subst x n (List l) = List (map (subst x n) l)
 subst x n (ListHead e) = ListHead (subst x n e)
+subst x n (ListTail e) = ListTail (subst x n e)
 subst _ _ e = e
 
 step :: Expr -> Expr
@@ -109,20 +110,13 @@ step (ListHead (List (x:_))) = x
 step (ListHead (List [])) = error "listHead: empty list"
 step (ListHead e) = ListHead (step e)
 
+-- ListTail
+step (ListTail (List (_:xs))) = List xs
+step (ListTail (List [])) = error "listTail: empty list"
+step (ListTail e) = ListTail (step e)
+
 step e = error (show e)
 
 -- Eval
 eval :: Expr -> Expr
 eval e = if isValue e then e else eval (step e)
-
--- head
-listHead :: Expr -> Expr
-listHead (List (x:_)) = x
-listHead (List []) = error "listHead: empty list"
-listHead _ = error "listHead: not a List"
-
--- tail
-listTail :: Expr -> Expr
-listTail (List (_:xs)) = List xs
-listTail (List []) = error "listTail: empty list"
-listTail _ = error "listTail: not a List"

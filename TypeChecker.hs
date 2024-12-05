@@ -58,6 +58,11 @@ typeof ctx (List l) = case l of
 typeof ctx (ListHead e) = case typeof ctx e of
                             Just (TList t) -> Just t
                             _ -> Nothing
+
+typeof ctx (ListTail e) = case typeof ctx e of
+                            Just (TList _) -> Just (TList TNum)
+                            _ -> Nothing
+
 typecheck :: Expr -> Expr
 typecheck e = case typeof [] e of
                 (Just _) -> e

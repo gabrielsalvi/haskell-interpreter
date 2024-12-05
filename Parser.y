@@ -29,6 +29,7 @@ import Lexer
     '\\' { TokenLam }
     "->" { TokenArrow }
     listHead { TokenListHead }
+    listTail { TokenListTail }
     var { TokenVar $$ }
     
 %nonassoc if then else
@@ -54,6 +55,7 @@ Exp : true { BTrue }
     | '[' ListExp ']' { List $2 }
     | var { Var $1 }
     | listHead Exp { ListHead $2 }
+    | listTail Exp { ListTail $2 }
 
 ListExp : { [] }
         | Exp { [$1] }

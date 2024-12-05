@@ -19,6 +19,8 @@ data Expr = BTrue
         | App Expr Expr
         | List [Expr]
         | ListHead Expr
+        | ListTail Expr
+
         deriving (Show, Eq)
 
 data Ty = TBool
@@ -49,6 +51,7 @@ data Token = TokenTrue
            | TokenComma
            | TokenList
            | TokenListHead
+           | TokenListTail
            deriving (Show)
 
 isSymb :: Char -> Bool
@@ -77,6 +80,7 @@ lexerKW cs = case span isAlpha cs of
                 ("else", rest) -> TokenElse : lexer rest
                 ("List", rest) -> TokenList : lexer rest
                 ("listHead", rest) -> TokenListHead : lexer rest
+                ("listTail", rest) -> TokenListTail : lexer rest
                 (var, rest) -> TokenVar var : lexer rest
 
 lexerSymbol :: String -> [Token]
