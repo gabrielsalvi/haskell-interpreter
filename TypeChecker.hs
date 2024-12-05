@@ -46,21 +46,20 @@ typeof ctx (App e1 e2) = case (typeof ctx e1, typeof ctx e2) of
                            _ -> Nothing
 
 typeof ctx (List l) = case l of
-                        [] -> Just (TList TNum)
-                        (x:xs) -> case typeof ctx x of
-                                    Just t -> if all ((== t) . (\e -> case typeof ctx e of
-                                                                        Just t' -> t'
-                                                                        _ -> error "Erro verificando tipo da lista")) xs
-                                              then Just (TList t)
-                                              else Nothing
-                                    _ -> Nothing
+    [] -> Just (TList TNum)
+    (x:xs) -> case typeof ctx x of
+        Just t -> if all (\e -> typeof ctx e == Just t) xs
+                  then Just (TList t)
+                  else Nothing
+        _ -> Nothing
+
 
 typeof ctx (ListHead e) = case typeof ctx e of
                             Just (TList t) -> Just t
                             _ -> Nothing
 
 typeof ctx (ListTail e) = case typeof ctx e of
-                            Just (TList _) -> Just (TList TNum)
+                            Just (TList t) -> Just (TList t)
                             _ -> Nothing
 
 typecheck :: Expr -> Expr
